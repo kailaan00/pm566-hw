@@ -109,6 +109,10 @@ We do not have any missing data/values in the set (which the first 0 notates).  
 
 # Site in Los Angeles
 
+```{r boxplot}
+library(ggplot2)
+qplot(year, log2(PM2.5), data = data, geom = "boxplot")
+```
 
 
 
