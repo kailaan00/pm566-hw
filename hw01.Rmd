@@ -110,6 +110,18 @@ We do not have any missing data/values in the set (which the first 0 notates). T
 
 # State
 
+```{r}
+ggplot(data)+
+  geom_boxplot(mapping = aes(x = year, y = pm2.5))
+```
+
+
+```{r}
+ggplot(data) +
+    geom_histogram(mapping = aes(x = year, y = pm2.5))
+```
+
+
 # County
 
 # Site in Los Angeles
