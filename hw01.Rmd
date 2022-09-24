@@ -112,17 +112,47 @@ We do not have any missing data/values in the set (which the first 0 notates). T
 
 ```{r}
 ggplot(data)+
-  geom_boxplot(mapping = aes(x = year, y = pm2.5))
+geom_boxplot(mapping = aes(x = year, y = PM2.5, group = year))
 ```
 
 
 ```{r}
-ggplot(data) +
-    geom_histogram(mapping = aes(x = year, y = pm2.5))
+state <- group_by(data, year, STATE) %>% summarize(PM2.5 = mean(PM2.5, na.rm = TRUE))
+qplot(xyear, PM2.5, data = mutate(state, xyear = as.numeric(as.character(year))), 
+       geom = c("point", "line"))
 ```
+
+
+```{r}
+summary(data04$'Daily Mean PM2.5 Concentration')
+summary(data19$'Daily Mean PM2.5 Concentration')
+```
+
+
+Based on the box plot, we can tell that the Daily Mean of PM2.5 Concentration was higher in 2004 than that of 2019.  When looking at the summary statistics, we can see that the mean for 2004 is 13.12, which is significantly higher than the mean of 7.738 for 2019.
 
 
 # County
 
+```{r}
+county <- group_by(data, year, COUNTY) %>% summarize(PM2.5 = mean(PM2.5, na.rm = TRUE))
+qplot(xyear, PM2.5, data = mutate(county, xyear = as.numeric(as.character(year))), 
+       color = factor(COUNTY), 
+       geom = c("point", "line"))
+```
+
+Based on the line plot, we can see that Kings County had the highest Daily Means of PM2.5 Concentration in both 2004 and 2019, though the levels did experience a decrease.  They had a maximum of 19.600 in 2004 and a minimum of 12.00 in 2019.  Most of the counties experienced a decrease in PM2.5 levels over the 15 years, but a few counties did experience an increase.  Counties such as Solano and Trinity had an increase in PM2.5 mean daily concentrations from 2004 to 2019.
+
+
 # Site in Los Angeles
+
+```{r}
+LA <- data[COUNTY_CODE ==37]
+sites <- group_by(data, year, "Site Name") %>% summarize(PM2.5 = mean(PM2.5, na.rm = TRUE))
+qplot(xyear, PM2.5, data = mutate(sites, xyear = as.numeric(as.character(year))), 
+       geom = c("point", "line")) 
+```
+
+Based on this line plot of the changing levels of PM2.5 Daily Mean Concentration at the LA site, we can see that LA has experienced a decrease in PM2.5 mean concentration between 2004 and 2019.  At 2004, the mean was 13.12 but in 2019, the mean was 7.738.  
+
 
