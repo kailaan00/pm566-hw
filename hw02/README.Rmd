@@ -1,0 +1,105 @@
+---
+title: "hw02"
+author: "Kaila An"
+date: "`r Sys.Date()`"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r install-libraries}
+library(tidyverse)
+library(data.table)
+library(dplyr)
+library(dtplyr)
+library(ggplot2)
+```
+
+## Data Wrangling
+
+Read in the data.
+
+```{r read}
+chsind <- data.table::fread("chs_individual.csv")
+chsreg <- data.table::fread("chs_regional.csv")
+```
+
+Merge the data sets.
+
+```{r merge}
+chs <- merge(chsind, chsreg, by="townname")
+```
+
+#1. After merging the data, make sure you don’t have any duplicates by counting the number of rows. Make sure it matches.
+
+```{r}
+nrow(chsind)
+nrow(chs)
+```
+
+There is no repeat data.  The merged set and the original individual set both have 1200 rows.
+
+#2. Create a new categorical variable named “obesity_level” using the BMI measurement (underweight BMI<14; normal BMI 14-22; overweight BMI 22-24; obese BMI>24). To make sure the variable is rightly coded, create a summary table that contains the minimum BMI, maximum BMI, and the total number of observations per category.
+
+```{r obesity_level}
+chs$obesity_level <- as.factor (ifelse(chs$bmi < 14, 'underweight',
+                                ifelse(chs$bmi < 22, 'normal', 
+                                ifelse(chs$bmi < 24, 'overweight','obese' ))))
+```
+
+```{r summary table}
+summary <- chs[, .(
+  minimum = min(bmi),
+  maximum = max(bmi),
+  count   = n
+)]
+```
+
+#3. Create another categorical variable named “smoke_gas_exposure” that summarizes “Second Hand Smoke” and “Gas Stove.” The variable should have four categories in total.
+
+```{r smoke gas}
+chs[ , smoke_gas_exposure := fifelse(smoke == 0 & gasstove == 0, "Neither",
+                            fifelse(smoke == 1 & gasstove == 0, "smoke_only",
+                            fifelse(smoke == 0 & gasstove == 1, "gas_only",
+                            fifelse(smoke == 1 & gasstove == 1, "both", NA_character_))))]
+
+chs[ ,.(total = length(smoke)), by = smoke_gas_exposure]
+```
+
+
+#4. Create four summary tables showing the average (or proportion, if binary) and sd of “Forced expiratory volume in 1 second (ml)” and asthma indicator by town, sex, obesity level, and “smoke_gas_exposure.”
+
+
+
+
+## Looking at the Data (EDA)
+
+
+Primary Questions of Interest
+
+#1. What is the association between BMI and FEV (forced expiratory volume)?
+
+#2. What is the association between smoke and gas exposure and FEV?
+
+#3. What is the association between PM2.5 exposure and FEV?
+
+
+Follow the EDA checklist from week 3 and the previous assignment. Be sure to focus on the key variables. Visualization Create the following figures and interpret them. Be sure to include easily understandable axes, titles, and legends.
+
+
+#1. Facet plot showing scatterplots with regression lines of BMI vs FEV by “townname”.
+
+#2. Stacked histograms of FEV by BMI category and FEV by smoke/gas exposure. Use different color schemes than the ggplot default.
+
+#3. Barchart of BMI by smoke/gas exposure.
+
+#4. Statistical summary graphs of FEV by BMI and FEV by smoke/gas exposure category.
+
+#5. A leaflet map showing the concentrations of PM2.5 mass in each of the CHS communities.
+
+#6. Choose a visualization to examine whether PM2.5 mass is associated with FEV.
+
+
