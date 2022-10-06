@@ -1,7 +1,7 @@
 hw02
 ================
 Kaila An
-2022-10-05
+2022-10-06
 
 ``` r
 library(tidyverse)
@@ -196,13 +196,129 @@ axes, titles, and legends.
 \#1. Facet plot showing scatterplots with regression lines of BMI vs FEV
 by “townname”.
 
+``` r
+chs[!is.na(townname)]%>%
+  ggplot(data = chs, mapping = aes(x = bmi, y = fev, color = townname)) +
+  geom_point() +
+  facet_wrap(~townname, nrow = 3) +
+  geom_smooth(method = 'lm', formula = y~x)
+```
+
+    ## Warning: Removed 95 rows containing non-finite values (stat_smooth).
+
+    ## Warning: Removed 95 rows containing missing values (geom_point).
+
+![](README_files/figure-gfm/facet%20plot-1.png)<!-- -->
+
 \#2. Stacked histograms of FEV by BMI category and FEV by smoke/gas
 exposure. Use different color schemes than the ggplot default.
 
+``` r
+ggplot(data = chs) + 
+  geom_histogram(mapping = aes(x = fev, fill = obesity_level), binwidth = 50) + scale_fill_brewer(palette = "RdPu")
+```
+
+    ## Warning: Removed 95 rows containing non-finite values (stat_bin).
+
+![](README_files/figure-gfm/FEV%20by%20BMI-1.png)<!-- -->
+
+``` r
+ggplot(data = chs) + 
+  geom_histogram(mapping = aes(x = fev, fill = smoke_gas_exposure), binwidth = 50) + scale_fill_brewer(palette = "OrRd")
+```
+
+    ## Warning: Removed 95 rows containing non-finite values (stat_bin).
+
+![](README_files/figure-gfm/FEV%20by%20smoke/gas-1.png)<!-- -->
+
 \#3. Barchart of BMI by smoke/gas exposure.
+
+``` r
+chs[!is.na(smoke_gas_exposure)] %>%
+  ggplot() + 
+  geom_bar(mapping = aes(x = bmi, colour = smoke_gas_exposure, fill = smoke_gas_exposure, binwidth = 100)) + 
+  scale_fill_brewer(palette = "BuPu")
+```
+
+    ## Warning: Ignoring unknown aesthetics: binwidth
+
+    ## Warning: Removed 81 rows containing non-finite values (stat_count).
+
+![](README_files/figure-gfm/BMI-1.png)<!-- -->
+
+``` r
+chs[!is.na(smoke_gas_exposure)] %>%
+  ggplot() + 
+  geom_bar(mapping = aes(x = obesity_level, colour = smoke_gas_exposure, fill = smoke_gas_exposure, binwidth = 50)) + 
+  scale_fill_brewer(palette = "BuPu")
+```
+
+    ## Warning: Ignoring unknown aesthetics: binwidth
+
+![](README_files/figure-gfm/bmi%20by%20obesity_levels-1.png)<!-- -->
 
 \#4. Statistical summary graphs of FEV by BMI and FEV by smoke/gas
 exposure category.
+
+``` r
+ggplot(data = chs) +
+ geom_line(mapping = aes(x = bmi, y = fev))
+```
+
+    ## Warning: Removed 89 row(s) containing missing values (geom_path).
+
+![](README_files/figure-gfm/fev%20by%20bmi%20line%20plot-1.png)<!-- -->
+
+``` r
+ggplot(data = chs) +
+ geom_line(mapping = aes(x = obesity_level, y = fev))
+```
+
+    ## Warning: Removed 89 row(s) containing missing values (geom_path).
+
+![](README_files/figure-gfm/fev%20by%20obesity_level%20line%20plot-1.png)<!-- -->
+
+``` r
+ggplot(data = chs) +
+ geom_line(mapping=aes(x = smoke_gas_exposure, y = fev))
+```
+
+    ## Warning: Removed 2 row(s) containing missing values (geom_path).
+
+![](README_files/figure-gfm/fev%20by%20smoke/gas%20exposure%20line%20plot-1.png)<!-- -->
+
+``` r
+chs[!is.na(bmi)] %>% 
+  ggplot()+
+  geom_boxplot(mapping=aes(x=bmi, y=fev, fill=bmi))
+```
+
+    ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
+
+    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
+
+![](README_files/figure-gfm/fev%20by%20bmi%20boxplot-1.png)<!-- -->
+
+``` r
+chs[!is.na(obesity_level)] %>% 
+  ggplot() +
+  geom_boxplot(mapping = aes(x = obesity_level, y = fev, fill = obesity_level)) +
+  scale_fill_brewer(palette = "Blues")
+```
+
+    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
+
+![](README_files/figure-gfm/fev%20by%20obesity_level%20boxplot-1.png)<!-- -->
+
+``` r
+chs[!is.na(bmi)] %>% 
+  ggplot() +
+  geom_boxplot(mapping = aes(x = smoke_gas_exposure, y = fev, fill = smoke_gas_exposure)) +   scale_fill_brewer(palette = "Blues")
+```
+
+    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
+
+![](README_files/figure-gfm/fev%20by%20smoke/gas%20exposure%20boxplot-1.png)<!-- -->
 
 \#5. A leaflet map showing the concentrations of PM2.5 mass in each of
 the CHS communities.
@@ -229,7 +345,20 @@ leaflet(chs) %>%
 \#6. Choose a visualization to examine whether PM2.5 mass is associated
 with FEV.
 
-Primary Questions of Interest
+``` r
+chs[!is.na(townname)]%>%
+  ggplot(data = chs, mapping = aes(x = pm25_mass, y = fev)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = y~x)
+```
+
+    ## Warning: Removed 95 rows containing non-finite values (stat_smooth).
+
+    ## Warning: Removed 95 rows containing missing values (geom_point).
+
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+## Primary Questions of Interest
 
 \#1. What is the association between BMI and FEV (forced expiratory
 volume)?
