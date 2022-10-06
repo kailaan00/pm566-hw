@@ -43,6 +43,12 @@ nrow(chs)
 
 There is no repeat data.  The merged set and the original individual set both have 1200 rows.
 
+Imputation step for missing values.
+
+```{r impute}
+chs[ , bmi_imp := fcoalesce(bmi, mean(bmi, na.rm = TRUE)),
+by = . (hispanic, male)]
+```
 
 #2. Create a new categorical variable named “obesity_level” using the BMI measurement (underweight BMI<14; normal BMI 14-22; overweight BMI 22-24; obese BMI>24). To make sure the variable is rightly coded, create a summary table that contains the minimum BMI, maximum BMI, and the total number of observations per category.
 
@@ -50,11 +56,6 @@ There is no repeat data.  The merged set and the original individual set both ha
 chs$obesity_level <- as.factor (ifelse(chs$bmi < 14, 'underweight',
                                 ifelse(chs$bmi < 22, 'normal', 
                                 ifelse(chs$bmi < 24, 'overweight','obese' ))))
-```
-
-```{r impute}
-chs[ , bmi_imp := fcoalesce(bmi, mean(bmi, na.rm = TRUE)),
-by = . (hispanic, male)]
 ```
 
 ```{r summary table}
@@ -114,6 +115,56 @@ chs[,.(
 
 Follow the EDA checklist from week 3 and the previous assignment. Be sure to focus on the key variables. Visualization Create the following figures and interpret them. Be sure to include easily understandable axes, titles, and legends.
 
+# EDA Checklist
+
+For each of the two datasets, check the dimensions, headers, footers, variable names and variable types.
+
+```{r dimensions}
+dim(chsind)
+dim(chsreg)
+dim(chs)
+```
+
+```{r headers}
+head(chsind)
+head(chsreg)
+head(chs)
+```
+
+```{r footers}
+tail(chsind)
+tail(chsreg)
+tail(chs)
+```
+
+```{r variable names/types}
+str(chsind)
+str(chsreg)
+str(chs)
+```
+
+Check for any data issues, particularly in the key variable we are analyzing.
+
+```{r summary obesity_level}
+summary(chs$obesity_level)
+```
+
+```{r bmi}
+summary(chs$bmi)
+```
+
+```{r pm25_mass}
+summary(chs$pm25_mass)
+```
+
+```{r fev}
+summary(chs$fev)
+```
+
+```{r smoke/gas exposure}
+summary(chs$smoke_gas_exposure)
+```
+
 
 #1. Facet plot showing scatterplots with regression lines of BMI vs FEV by “townname”.
 
@@ -125,6 +176,7 @@ chs[!is.na(townname)]%>%
   geom_smooth(method = 'lm', formula = y~x)
 ```
 
+In the different towns, we can see that BMI and FEV are consistently positively correlated.  Increased BMI results in increased FEV.
 
 #2. Stacked histograms of FEV by BMI category and FEV by smoke/gas exposure. Use different color schemes than the ggplot default.
 
@@ -133,11 +185,14 @@ ggplot(data = chs) +
   geom_histogram(mapping = aes(x = fev, fill = obesity_level), binwidth = 50) + scale_fill_brewer(palette = "RdPu")
 ```
 
+Higher weight (being in the overweight to obese weight category) results in higher FEV levels while those who are underweight experience lower FEV levels.
+
 ```{r FEV by smoke/gas}
 ggplot(data = chs) + 
   geom_histogram(mapping = aes(x = fev, fill = smoke_gas_exposure), binwidth = 50) + scale_fill_brewer(palette = "OrRd")
 ```
 
+There are no major notable differences between the different categories for smoke/gas exposure.  If anything, it can be important to note that majority have gas_only or both.
 
 #3. Barchart of BMI by smoke/gas exposure.
 
@@ -148,6 +203,8 @@ chs[!is.na(smoke_gas_exposure)] %>%
   scale_fill_brewer(palette = "BuPu")
 ```
 
+Higher counts of gas_only and lower BMI are affiliated.  
+
 ```{r bmi by obesity_levels}
 chs[!is.na(smoke_gas_exposure)] %>%
   ggplot() + 
@@ -155,29 +212,16 @@ chs[!is.na(smoke_gas_exposure)] %>%
   scale_fill_brewer(palette = "BuPu")
 ```
 
+There is no great difference between the distribution of the different categories for each of the obesity level groups.  Most seem to fall into the normal cateogry, which is why the bar is much larger there.
 
 #4. Statistical summary graphs of FEV by BMI and FEV by smoke/gas exposure category.
 
-```{r fev by bmi line plot}
-ggplot(data = chs) +
- geom_line(mapping = aes(x = bmi, y = fev))
-```
-
-```{r fev by obesity_level line plot}
-ggplot(data = chs) +
- geom_line(mapping = aes(x = obesity_level, y = fev))
-```
-
-
-```{r fev by smoke/gas exposure line plot}
-ggplot(data = chs) +
- geom_line(mapping=aes(x = smoke_gas_exposure, y = fev))
-```
 ```{r fev by bmi boxplot}
 chs[!is.na(bmi)] %>% 
   ggplot()+
   geom_boxplot(mapping=aes(x=bmi, y=fev, fill=bmi))
 ```
+Greater BMI is affiliated with greater levels of FEV, and lower BMI is affiliated with lower levels of FEV.
 
 ```{r fev by obesity_level boxplot}
 chs[!is.na(obesity_level)] %>% 
@@ -186,12 +230,15 @@ chs[!is.na(obesity_level)] %>%
   scale_fill_brewer(palette = "Blues")
 ```
 
+Those of lower BMI and therefore, those who are underweight experience lower FEV.  Those of higher BMI (obese and overweight) experience higher levels of FEV.
+
 ```{r fev by smoke/gas exposure boxplot}
 chs[!is.na(bmi)] %>% 
   ggplot() +
   geom_boxplot(mapping = aes(x = smoke_gas_exposure, y = fev, fill = smoke_gas_exposure)) +   scale_fill_brewer(palette = "Blues")
 ```
 
+There are no major differences between the different categories.  If anything, smoke_only is affiliated with slightly lower FEV levels and gas only is affiliated with very slightly higher FEV levels.
 
 #5. A leaflet map showing the concentrations of PM2.5 mass in each of the CHS communities.
 
@@ -210,6 +257,8 @@ leaflet(chs) %>%
              title ='pm25_mass levels in CHS communities', opacity=1)
 ```
 
+PM25_mass levels seem to be lower in concentration near Santa Maria and Santa Barbara and at highest concentration in Riverside.
+
 #6. Choose a visualization to examine whether PM2.5 mass is associated with FEV.
 
 ```{r}
@@ -219,13 +268,18 @@ chs[!is.na(townname)]%>%
   geom_smooth(method = 'lm', formula = y~x)
 ```
 
+Greater PM25_mass results in lower FEV levels.
 
 ## Primary Questions of Interest
 
 #1. What is the association between BMI and FEV (forced expiratory volume)?
 
+The association between BMI and FEV is that higher BMI tends to indicate higher levels of forced expiratory volume.  Lower BMI (underweight) tends to indicate lower levels or forced expiratory volume.
+
 #2. What is the association between smoke and gas exposure and FEV?
+
+The association between smoke and gas exposure and FEV is not too noticeable/notable.  Having smoke_only resulted in slightly lower FEV levels, but the difference is extremely small.  On the other hand, having gas_only led to the highest fev_levels, but this difference was also very small.
 
 #3. What is the association between PM2.5 exposure and FEV?
 
-
+Greater/higher levels of PM2.5 mass exposure result in lower forced expiratory volume levels.
