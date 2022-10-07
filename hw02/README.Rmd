@@ -272,14 +272,14 @@ Greater PM25_mass results in lower FEV levels.
 
 ## Primary Questions of Interest
 
-#1. What is the association between BMI and FEV (forced expiratory volume)?
+##1. What is the association between BMI and FEV (forced expiratory volume)?
 
 The association between BMI and FEV is that higher BMI tends to indicate higher levels of forced expiratory volume.  Lower BMI (underweight) tends to indicate lower levels or forced expiratory volume.
 
-#2. What is the association between smoke and gas exposure and FEV?
+##2. What is the association between smoke and gas exposure and FEV?
 
 The association between smoke and gas exposure and FEV is not too noticeable/notable.  Having smoke_only resulted in slightly lower FEV levels, but the difference is extremely small.  On the other hand, having gas_only led to the highest fev_levels, but this difference was also very small.
 
-#3. What is the association between PM2.5 exposure and FEV?
+##3. What is the association between PM2.5 exposure and FEV?
 
 Greater/higher levels of PM2.5 mass exposure result in lower forced expiratory volume levels.
