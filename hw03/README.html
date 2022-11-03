@@ -404,15 +404,15 @@ counts &lt;- as.character(counts)
 
 # Extracting the data using regex
 stringr::str_extract(counts, &quot;[0-9,]+&quot;)</code></pre>
-<pre><code>## [1] &quot;4,005&quot;</code></pre>
-<p>I found 4,005 papers in the database.</p>
+<pre><code>## [1] &quot;4,006&quot;</code></pre>
+<p>I found 4,006 papers in the database.</p>
 <p>Details:</p>
 <pre class="r"><code>query_ids &lt;- GET(
   url   = &quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;,
   query = list(
     db      = &quot;pubmed&quot;,
     term    = &quot;sars-cov-2 trial vaccine&quot;,
-    retmax  = 1000
+    retmax  = 250
   ), 
 )
 # Extracting the content of the response of GET
@@ -434,7 +434,7 @@ than 250 ids, just keep the first 250.</h2>
   url        = &quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi&quot;,
   query      = list(
   db         = &quot;pubmed&quot;,
-  id         = paste(ids,collapse = &quot;,&quot;),
+  id         = paste(ids[250],collapse = &quot;,&quot;),
   retmax     = 250,
   rettype    = &quot;abstract&quot;
     )
@@ -451,40 +451,40 @@ was published, Publication date, and Abstract of the paper (if any).</p>
 pub_char_list &lt;- sapply(pub_char_list, as.character)</code></pre>
 <pre class="r"><code>abstracts &lt;- str_extract(pub_char_list, &quot;&lt;Abstract&gt;[[:print:][:space:]]+&lt;/Abstract&gt;&quot;)
 abstracts[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;&lt;Abstract&gt;\n        &lt;AbstractText Label=\&quot;Background\&quot; NlmCategory=\&quot;UNASSIGNED\&quot;&gt;The main objective of the present study was to analyze both clinical characteristics and evolution during hospitalization of a cohort of patients admitted for COVID-19 pneumonia who were not vaccinated, or with a complete or incomplete vaccination schedule.&lt;/AbstractText&gt;\n        &lt;AbstractText Label=\&quot;Methods\&quot; NlmCategory=\&quot;UNASSIGNED\&quot;&gt;This COVID-19 specialized single-center cohort study of 1888 COVID-19 patients hospitalized at the \&quot;Enfermera Isabel Zendal\&quot; Emergencies Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and September 30, 2021. It compared the results of 1327 hospitalized unvaccinated patients to 209 hospitalized fully vaccinated and 352 hospitalized partially vaccinated patients. The four different COVID-19 vaccines authorized in Spain during the time-period studied were: BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna); Ad26.COV2.S (Janssen).&lt;/AbstractText&gt;\n        &lt;AbstractText Label=\&quot;Findings\&quot; NlmCategory=\&quot;UNASSIGNED\&quot;&gt;Hospitalized patients&#39; median age was 41 years (IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully vaccinated ones. The main comorbidities were obesity, hypertension and diabetes mellitus. 20% of unvaccinated patients (266) required noninvasive respiratory care, as did 14% (51) of partially and 14% (30) of fully vaccinated; 6% (78) of the unvaccinated patients also needed invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully vaccinated.&lt;/AbstractText&gt;\n        &lt;AbstractText Label=\&quot;Interpretation\&quot; NlmCategory=\&quot;UNASSIGNED\&quot;&gt;Fully vaccinated patients were 84% (95% CI: 82-86%) less likely to be admitted to hospital, and protection rose for those aged &amp;lt;50 years. Once hospitalized, vaccinated patients displayed more protection against requiring respiratory care than unvaccinated ones, despite being older and having more comorbidities. No differences appeared for the four studied COVID-19 vaccines and complying with vaccination recommendations proved relevant.&lt;/AbstractText&gt;\n        &lt;AbstractText Label=\&quot;Funding\&quot; NlmCategory=\&quot;UNASSIGNED\&quot;&gt;The research was funded by the \&quot;Plan Propio de Investigación\&quot; Program of the Castilla-La Mancha University /European Regional Development Fund (2021-GRIN-31,039).&lt;/AbstractText&gt;\n        &lt;CopyrightInformation&gt;© 2022 The Authors.&lt;/CopyrightInformation&gt;\n      &lt;/Abstract&gt;&quot;</code></pre>
 <pre class="r"><code>abstracts &lt;- str_remove_all(abstracts, &quot;&lt;/?[[:alnum:]- =\&quot;]+&gt;&quot;)
 abstracts[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;\n        The main objective of the present study was to analyze both clinical characteristics and evolution during hospitalization of a cohort of patients admitted for COVID-19 pneumonia who were not vaccinated, or with a complete or incomplete vaccination schedule.\n        This COVID-19 specialized single-center cohort study of 1888 COVID-19 patients hospitalized at the \&quot;Enfermera Isabel Zendal\&quot; Emergencies Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and September 30, 2021. It compared the results of 1327 hospitalized unvaccinated patients to 209 hospitalized fully vaccinated and 352 hospitalized partially vaccinated patients. The four different COVID-19 vaccines authorized in Spain during the time-period studied were: BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna); Ad26.COV2.S (Janssen).\n        Hospitalized patients&#39; median age was 41 years (IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully vaccinated ones. The main comorbidities were obesity, hypertension and diabetes mellitus. 20% of unvaccinated patients (266) required noninvasive respiratory care, as did 14% (51) of partially and 14% (30) of fully vaccinated; 6% (78) of the unvaccinated patients also needed invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully vaccinated.\n        Fully vaccinated patients were 84% (95% CI: 82-86%) less likely to be admitted to hospital, and protection rose for those aged &amp;lt;50 years. Once hospitalized, vaccinated patients displayed more protection against requiring respiratory care than unvaccinated ones, despite being older and having more comorbidities. No differences appeared for the four studied COVID-19 vaccines and complying with vaccination recommendations proved relevant.\n        The research was funded by the \&quot;Plan Propio de Investigación\&quot; Program of the Castilla-La Mancha University /European Regional Development Fund (2021-GRIN-31,039).\n        © 2022 The Authors.\n      &quot;</code></pre>
 <pre class="r"><code>abstracts &lt;- str_replace_all(abstracts, &quot;[[:space:]]+&quot;, &quot; &quot;)
 abstracts[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot; The main objective of the present study was to analyze both clinical characteristics and evolution during hospitalization of a cohort of patients admitted for COVID-19 pneumonia who were not vaccinated, or with a complete or incomplete vaccination schedule. This COVID-19 specialized single-center cohort study of 1888 COVID-19 patients hospitalized at the \&quot;Enfermera Isabel Zendal\&quot; Emergencies Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and September 30, 2021. It compared the results of 1327 hospitalized unvaccinated patients to 209 hospitalized fully vaccinated and 352 hospitalized partially vaccinated patients. The four different COVID-19 vaccines authorized in Spain during the time-period studied were: BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna); Ad26.COV2.S (Janssen). Hospitalized patients&#39; median age was 41 years (IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully vaccinated ones. The main comorbidities were obesity, hypertension and diabetes mellitus. 20% of unvaccinated patients (266) required noninvasive respiratory care, as did 14% (51) of partially and 14% (30) of fully vaccinated; 6% (78) of the unvaccinated patients also needed invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less likely to be admitted to hospital, and protection rose for those aged &amp;lt;50 years. Once hospitalized, vaccinated patients displayed more protection against requiring respiratory care than unvaccinated ones, despite being older and having more comorbidities. No differences appeared for the four studied COVID-19 vaccines and complying with vaccination recommendations proved relevant. The research was funded by the \&quot;Plan Propio de Investigación\&quot; Program of the Castilla-La Mancha University /European Regional Development Fund (2021-GRIN-31,039). © 2022 The Authors. &quot;</code></pre>
 <pre class="r"><code>titles &lt;- str_extract(pub_char_list, &quot;&lt;ArticleTitle&gt;[[:print:][:space:]]+&lt;/ArticleTitle&gt;&quot;)
 titles[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;&lt;ArticleTitle&gt;Clinical characteristics and respiratory care in hospitalized vaccinated SARS-CoV-2 patients.&lt;/ArticleTitle&gt;&quot;</code></pre>
 <pre class="r"><code>titles &lt;- str_remove_all(titles, &quot;&lt;/?[[:alnum:]- =\&quot;]+&gt;&quot;)
 titles[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;Clinical characteristics and respiratory care in hospitalized vaccinated SARS-CoV-2 patients.&quot;</code></pre>
 <pre class="r"><code>journal &lt;- str_extract(pub_char_list, &quot;&lt;Journal&gt;[[:print:][:space:]]+&lt;/Journal&gt;&quot;)
 journal[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;&lt;Journal&gt;\n        &lt;ISSN IssnType=\&quot;Electronic\&quot;&gt;2589-5370&lt;/ISSN&gt;\n        &lt;JournalIssue CitedMedium=\&quot;Internet\&quot;&gt;\n          &lt;Volume&gt;48&lt;/Volume&gt;\n          &lt;PubDate&gt;\n            &lt;Year&gt;2022&lt;/Year&gt;\n            &lt;Month&gt;Jun&lt;/Month&gt;\n          &lt;/PubDate&gt;\n        &lt;/JournalIssue&gt;\n        &lt;Title&gt;EClinicalMedicine&lt;/Title&gt;\n        &lt;ISOAbbreviation&gt;EClinicalMedicine&lt;/ISOAbbreviation&gt;\n      &lt;/Journal&gt;&quot;</code></pre>
 <pre class="r"><code>journal &lt;- str_extract(journal, &quot;&lt;Title&gt;[[:print:][:space:]]+&lt;/Title&gt;&quot;)
 journal[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;&lt;Title&gt;EClinicalMedicine&lt;/Title&gt;&quot;</code></pre>
 <pre class="r"><code>journal &lt;- str_remove_all(journal, &quot;&lt;/?[[:alnum:]- =\&quot;]+&gt;&quot;) 
 journal[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;EClinicalMedicine&quot;</code></pre>
 <pre class="r"><code>journal &lt;- str_replace_all(journal, &quot;[[:space:]]+&quot;, &quot; &quot;)
 journal[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;EClinicalMedicine&quot;</code></pre>
 <pre class="r"><code>pubdate &lt;- str_extract(pub_char_list, &quot;&lt;PubDate&gt;[[:print:][:space:]]+&lt;/PubDate&gt;&quot;)
 pubdate[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;&lt;PubDate&gt;\n            &lt;Year&gt;2022&lt;/Year&gt;\n            &lt;Month&gt;Jun&lt;/Month&gt;\n          &lt;/PubDate&gt;&quot;</code></pre>
 <pre class="r"><code>pubdate &lt;- str_remove_all(pubdate, &quot;&lt;/?[[:alnum:]- =\&quot;]+&gt;&quot;)
 pubdate[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot;\n            2022\n            Jun\n          &quot;</code></pre>
 <pre class="r"><code>pubdate &lt;- str_replace_all(pubdate, &quot;[[:space:]]+&quot;, &quot; &quot;)
 pubdate[[1]]</code></pre>
-<pre><code>## [1] NA</code></pre>
+<pre><code>## [1] &quot; 2022 Jun &quot;</code></pre>
 <pre class="r"><code>database &lt;- data.frame(
   PubMedId = ids,
   Titles    = titles,
@@ -495,6 +495,13 @@ pubdate[[1]]</code></pre>
 
 knitr::kable(database[1:8,])</code></pre>
 <table>
+<colgroup>
+<col width="0%" />
+<col width="4%" />
+<col width="93%" />
+<col width="0%" />
+<col width="0%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">PubMedId</th>
@@ -507,59 +514,291 @@ knitr::kable(database[1:8,])</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">36322837</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="even">
 <td align="left">36320825</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="odd">
 <td align="left">36314847</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="even">
 <td align="left">36307830</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="odd">
 <td align="left">36305195</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="even">
 <td align="left">36301821</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="odd">
 <td align="left">36299427</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 <tr class="even">
 <td align="left">36298743</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">Clinical characteristics and respiratory care in
+hospitalized vaccinated SARS-CoV-2 patients.</td>
+<td align="left">The main objective of the present study was to analyze
+both clinical characteristics and evolution during hospitalization of a
+cohort of patients admitted for COVID-19 pneumonia who were not
+vaccinated, or with a complete or incomplete vaccination schedule. This
+COVID-19 specialized single-center cohort study of 1888 COVID-19
+patients hospitalized at the “Enfermera Isabel Zendal” Emergencies
+Hospital (HEEIZ), Madrid (Spain) was performed between July 1 and
+September 30, 2021. It compared the results of 1327 hospitalized
+unvaccinated patients to 209 hospitalized fully vaccinated and 352
+hospitalized partially vaccinated patients. The four different COVID-19
+vaccines authorized in Spain during the time-period studied were:
+BNT162b2 (Pfizer); ChAdOx1 nCoV-19 (AstraZeneca), mRNA-1273 (Moderna);
+Ad26.COV2.S (Janssen). Hospitalized patients’ median age was 41 years
+(IQR 33-50) for the unvaccinated and 61 years (IQR 53-67) for the fully
+vaccinated ones. The main comorbidities were obesity, hypertension and
+diabetes mellitus. 20% of unvaccinated patients (266) required
+noninvasive respiratory care, as did 14% (51) of partially and 14% (30)
+of fully vaccinated; 6% (78) of the unvaccinated patients also needed
+invasive respiratory care, as did 5% (16) of partially and 11 (5%) fully
+vaccinated. Fully vaccinated patients were 84% (95% CI: 82-86%) less
+likely to be admitted to hospital, and protection rose for those aged
+&lt;50 years. Once hospitalized, vaccinated patients displayed more
+protection against requiring respiratory care than unvaccinated ones,
+despite being older and having more comorbidities. No differences
+appeared for the four studied COVID-19 vaccines and complying with
+vaccination recommendations proved relevant. The research was funded by
+the “Plan Propio de Investigación” Program of the Castilla-La Mancha
+University /European Regional Development Fund (2021-GRIN-31,039). ©
+2022 The Authors.</td>
+<td align="left">EClinicalMedicine</td>
+<td align="left">2022 Jun</td>
 </tr>
 </tbody>
 </table>

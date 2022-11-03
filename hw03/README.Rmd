@@ -38,7 +38,7 @@ counts <- as.character(counts)
 stringr::str_extract(counts, "[0-9,]+")
 ```
 
-I found 4,005 papers in the database.
+I found 4,006 papers in the database.
 
 Details:
 
@@ -48,7 +48,7 @@ query_ids <- GET(
   query = list(
     db      = "pubmed",
     term    = "sars-cov-2 trial vaccine",
-    retmax  = 1000
+    retmax  = 250
   ), 
 )
 # Extracting the content of the response of GET
@@ -73,7 +73,7 @@ publications <- GET(
   url        = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
   query      = list(
   db         = "pubmed",
-  id         = paste(ids,collapse = ","),
+  id         = paste(ids[250],collapse = ","),
   retmax     = 250,
   rettype    = "abstract"
     )
