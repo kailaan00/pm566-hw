@@ -74,7 +74,6 @@ publications <- GET(
   query      = list(
   db         = "pubmed",
   id         = paste(ids,collapse = ","),
-  term       = "sars-cov-2 trial vaccine",
   retmax     = 250,
   rettype    = "abstract"
     )
@@ -138,8 +137,8 @@ pubdate[[1]]
 ```{r}
 database <- data.frame(
   PubMedId = ids,
-  Title    = titles,
-  Abstract = abstracts,
+  Titles    = titles,
+  Abstracts = abstracts,
   Journal = journal,
   PubDate = pubdate
 )

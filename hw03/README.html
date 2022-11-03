@@ -435,7 +435,6 @@ than 250 ids, just keep the first 250.</h2>
   query      = list(
   db         = &quot;pubmed&quot;,
   id         = paste(ids,collapse = &quot;,&quot;),
-  term       = &quot;sars-cov-2 trial vaccine&quot;,
   retmax     = 250,
   rettype    = &quot;abstract&quot;
     )
@@ -488,8 +487,8 @@ pubdate[[1]]</code></pre>
 <pre><code>## [1] NA</code></pre>
 <pre class="r"><code>database &lt;- data.frame(
   PubMedId = ids,
-  Title    = titles,
-  Abstract = abstracts,
+  Titles    = titles,
+  Abstracts = abstracts,
   Journal = journal,
   PubDate = pubdate
 )
@@ -499,8 +498,8 @@ knitr::kable(database[1:8,])</code></pre>
 <thead>
 <tr class="header">
 <th align="left">PubMedId</th>
-<th align="left">Title</th>
-<th align="left">Abstract</th>
+<th align="left">Titles</th>
+<th align="left">Abstracts</th>
 <th align="left">Journal</th>
 <th align="left">PubDate</th>
 </tr>
