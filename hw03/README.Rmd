@@ -22,7 +22,7 @@ library(stringr)
 
 # APIs
 
-## Using the NCBI API, look for papers that show up under the term “sars-cov-2 trial vaccine.” Look for the data in the pubmed database, and then retrieve the details of the paper as shown in lab 7. How many papers were you able to find?
+Using the NCBI API, look for papers that show up under the term “sars-cov-2 trial vaccine.” Look for the data in the pubmed database, and then retrieve the details of the paper as shown in lab 7. How many papers were you able to find?
 
 ```{r-number-of-papers}
 # Downloading the website
@@ -45,7 +45,7 @@ I found 4,005 papers in the database.
 ```
 
 
-## Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
+Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
 
 ```{r}
 publications <- GET(
@@ -63,7 +63,7 @@ publications_txt  <- as.character(publications)
 ```
 
 
-## As we did in lab 7. Create a dataset containing the following:
+As we did in lab 7. Create a dataset containing the following:
 
 Pubmed ID number,
 Title of the paper,
@@ -81,10 +81,11 @@ A new dataset has been added to the data science data repository https://github.
 
 ## Question 1. Tokenize the abstracts and count the number of each token. Do you see anything interesting? Does removing stop words change what tokens appear as the most frequent? What are the 5 most common tokens for each search term after removing stopwords?
 
+
 ```{r}
 if (!file.exists("pubmed.csv"))
   download.file(
-    url      = "https://github.com/USCbiostats/data-science-data/tree/master/03_pubmed",
+     url     = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/03_pubmed/pubmed.csv",
     destfile = "pubmed.csv",
     method   = "libcurl",
     timeout  = 60
@@ -97,8 +98,6 @@ str(pubmed)
 pubmed <- as_tibble(pubmed)
 pubmed
 ```
-
-
 
 
 

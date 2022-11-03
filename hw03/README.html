@@ -388,11 +388,10 @@ library(tidyverse)</code></pre>
 library(stringr)</code></pre>
 <div id="apis" class="section level1">
 <h1>APIs</h1>
-<div id="using-the-ncbi-api-look-for-papers-that-show-up-under-the-term-sars-cov-2-trial-vaccine.-look-for-the-data-in-the-pubmed-database-and-then-retrieve-the-details-of-the-paper-as-shown-in-lab-7.-how-many-papers-were-you-able-to-find" class="section level2">
-<h2>Using the NCBI API, look for papers that show up under the term
+<p>Using the NCBI API, look for papers that show up under the term
 “sars-cov-2 trial vaccine.” Look for the data in the pubmed database,
 and then retrieve the details of the paper as shown in lab 7. How many
-papers were you able to find?</h2>
+papers were you able to find?</p>
 <pre class="{r-number-of-papers}"><code># Downloading the website
 website &lt;- xml2::read_html(&quot;https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2%20trial%20vaccine&quot;)
 
@@ -406,11 +405,9 @@ counts &lt;- as.character(counts)
 stringr::str_extract(counts, &quot;[0-9,]+&quot;)</code></pre>
 <p>I found 4,005 papers in the database.</p>
 <pre class="{r-details}"><code></code></pre>
-</div>
-<div id="using-the-list-of-pubmed-ids-you-retrieved-download-each-papers-details-using-the-query-parameter-rettype-abstract.-if-you-get-more-than-250-ids-just-keep-the-first-250." class="section level2">
-<h2>Using the list of pubmed ids you retrieved, download each papers’
+<p>Using the list of pubmed ids you retrieved, download each papers’
 details using the query parameter rettype = abstract. If you get more
-than 250 ids, just keep the first 250.</h2>
+than 250 ids, just keep the first 250.</p>
 <pre class="r"><code>publications &lt;- GET(
   url   = &quot;https://eutils.ncbi.nlm.nih.gov/&quot;,
   query = list(
@@ -423,12 +420,9 @@ rettype = &quot;abstract&quot;
 # Turning the output into character vector
 publications      &lt;- httr::content(publications)
 publications_txt  &lt;- as.character(publications)</code></pre>
-</div>
-<div id="as-we-did-in-lab-7.-create-a-dataset-containing-the-following" class="section level2">
-<h2>As we did in lab 7. Create a dataset containing the following:</h2>
+<p>As we did in lab 7. Create a dataset containing the following:</p>
 <p>Pubmed ID number, Title of the paper, Name of the journal where it
 was published, Publication date, and Abstract of the paper (if any).</p>
-</div>
 </div>
 <div id="text-mining" class="section level1">
 <h1>Text Mining</h1>
@@ -442,7 +436,7 @@ what tokens appear as the most frequent? What are the 5 most common
 tokens for each search term after removing stopwords?</h2>
 <pre class="r"><code>if (!file.exists(&quot;pubmed.csv&quot;))
   download.file(
-    url      = &quot;https://github.com/USCbiostats/data-science-data/tree/master/03_pubmed&quot;,
+     url     = &quot;https://raw.githubusercontent.com/USCbiostats/data-science-data/master/03_pubmed/pubmed.csv&quot;,
     destfile = &quot;pubmed.csv&quot;,
     method   = &quot;libcurl&quot;,
     timeout  = 60
