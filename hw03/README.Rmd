@@ -22,9 +22,9 @@ library(stringr)
 
 # APIs
 
-Using the NCBI API, look for papers that show up under the term “sars-cov-2 trial vaccine.” Look for the data in the pubmed database, and then retrieve the details of the paper as shown in lab 7. How many papers were you able to find?
+## Using the NCBI API, look for papers that show up under the term “sars-cov-2 trial vaccine.” Look for the data in the pubmed database, and then retrieve the details of the paper as shown in lab 7. How many papers were you able to find?
 
-```{r-number-of-papers}
+```{r}
 # Downloading the website
 website <- xml2::read_html("https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2%20trial%20vaccine")
 
@@ -40,30 +40,52 @@ stringr::str_extract(counts, "[0-9,]+")
 
 I found 4,005 papers in the database.
 
-```{r-details}
+Details:
 
+```{r}
+query_ids <- GET(
+  url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
+  query = list(
+    db      = "pubmed",
+    term    = "sars-cov-2 trial vaccine",
+    retmax  = 1000
+  ), 
+)
+# Extracting the content of the response of GET
+ids <- httr::content(query_ids)
+```
+
+```{r}
+# Turn the result into a character vector
+ids <- as.character(ids)
+# Find all the ids 
+ids <- stringr::str_extract_all(ids, "<Id>[[:digit:]]+</Id>")[[1]]
+# Remove all the leading and trailing <Id> </Id>. Make use of "|"
+ids <- stringr::str_remove_all(ids, "</?Id>")
+head(ids)
 ```
 
 
-Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
+## Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
 
 ```{r}
 publications <- GET(
-  url   = "https://eutils.ncbi.nlm.nih.gov/",
-  query = list(
-    db  = "pubmed",
-    id  = paste(collapse = ","),
-retmax  = 250,
-rettype = "abstract"
+  url        = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
+  query      = list(
+  db         = "pubmed",
+  id         = paste(ids,collapse = ","),
+  term       = "sars-cov-2 trial vaccine",
+  retmax     = 250,
+  rettype    = "abstract"
     )
 )
 # Turning the output into character vector
-publications      <- httr::content(publications)
+publications     <- httr::content(publications)
 publications_txt  <- as.character(publications)
 ```
 
 
-As we did in lab 7. Create a dataset containing the following:
+## As we did in lab 7. Create a dataset containing the following:
 
 Pubmed ID number,
 Title of the paper,
@@ -72,8 +94,59 @@ Publication date, and
 Abstract of the paper (if any).
 
 ```{r}
-
+pub_char_list <- xml2::xml_children(publications)
+pub_char_list <- sapply(pub_char_list, as.character)
 ```
+
+```{r}
+abstracts <- str_extract(pub_char_list, "<Abstract>[[:print:][:space:]]+</Abstract>")
+abstracts[[1]]
+abstracts <- str_remove_all(abstracts, "</?[[:alnum:]- =\"]+>")
+abstracts[[1]]
+abstracts <- str_replace_all(abstracts, "[[:space:]]+", " ")
+abstracts[[1]]
+```
+
+```{r}
+titles <- str_extract(pub_char_list, "<ArticleTitle>[[:print:][:space:]]+</ArticleTitle>")
+titles[[1]]
+titles <- str_remove_all(titles, "</?[[:alnum:]- =\"]+>")
+titles[[1]]
+```
+
+```{r}
+journal <- str_extract(pub_char_list, "<Journal>[[:print:][:space:]]+</Journal>")
+journal[[1]]
+journal <- str_extract(journal, "<Title>[[:print:][:space:]]+</Title>")
+journal[[1]]
+journal <- str_remove_all(journal, "</?[[:alnum:]- =\"]+>") 
+journal[[1]]
+journal <- str_replace_all(journal, "[[:space:]]+", " ")
+journal[[1]]
+```
+
+```{r}
+pubdate <- str_extract(pub_char_list, "<PubDate>[[:print:][:space:]]+</PubDate>")
+pubdate[[1]]
+pubdate <- str_remove_all(pubdate, "</?[[:alnum:]- =\"]+>")
+pubdate[[1]]
+pubdate <- str_replace_all(pubdate, "[[:space:]]+", " ")
+pubdate[[1]]
+```
+
+
+```{r}
+database <- data.frame(
+  PubMedId = ids,
+  Title    = titles,
+  Abstract = abstracts,
+  Journal = journal,
+  PubDate = pubdate
+)
+
+knitr::kable(database[1:8,])
+```
+
 
 
 # Text Mining
@@ -81,16 +154,11 @@ A new dataset has been added to the data science data repository https://github.
 
 ## Question 1. Tokenize the abstracts and count the number of each token. Do you see anything interesting? Does removing stop words change what tokens appear as the most frequent? What are the 5 most common tokens for each search term after removing stopwords?
 
+Read in data
 
 ```{r}
-if (!file.exists("pubmed.csv"))
-  download.file(
-     url     = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/03_pubmed/pubmed.csv",
-    destfile = "pubmed.csv",
-    method   = "libcurl",
-    timeout  = 60
-    )
-pubmed <- read.csv("pubmed.csv")
+pubmed <- read.csv("https://raw.githubusercontent.com/USCbiostats/data-science-data/master/03_pubmed/pubmed.csv")
+
 str(pubmed)
 ```
 
@@ -99,14 +167,59 @@ pubmed <- as_tibble(pubmed)
 pubmed
 ```
 
+Tokenize the abstracts.
+
+```{r}
+pubmed %>%
+  unnest_tokens(token, abstract) %>%
+  count(token, sort = TRUE) %>%
+  top_n(20,n) %>%
+  ggplot(aes(n, fct_reorder(token, n))) +
+  geom_col()
+```
+
+After initially tokenizing, we do not see a ton of medical terminology.  The most common words found were 'the', 'of', 'and', 'in', etc.  These are words that are common in writings, in general.  
+
+
+Remove the stop words.
+
+```{r}
+pubmed %>%
+  unnest_tokens(token, abstract) %>%
+  anti_join(stop_words, by = c("token" = "word")) %>%
+  count(token, sort = TRUE) %>%
+  filter(!grepl(pattern = "^[0-9]+$", x = token)) %>%
+  top_n(5, n) %>%
+  ggplot(aes(n, fct_reorder(token, n)))+
+  geom_col()
+```
+
+After removing the stop words, we see more medical terminology as the most common words/terms seen in the abtracts (covid, patients, cancer, prostate, disease).
 
 
 ## Question 2. Tokenize the abstracts into bigrams. Find the 10 most common bigram and visualize them with ggplot2.
 
+```{r}
+pubmed %>%
+  unnest_ngrams(bigram, abstract, n=2) %>%
+  count(bigram, sort = TRUE) %>%
+  top_n(10, n) %>%
+  ggplot(aes(n, fct_reorder(bigram, n))) +
+  geom_col()
+```
+
+
 ## Question 3. Calculate the TF-IDF value for each word-search term combination. (here you want the search term to be the “document”) What are the 5 tokens from each search term with the highest TF-IDF value? How are the results different from the answers you got in question 1?
 
-
-
+```{r}
+pubmed %>%
+  unnest_tokens(token, abstract) %>%
+  count(term, token, sort = TRUE) %>%
+  bind_tf_idf(token, term, n) %>%
+  top_n(50, tf_idf) %>%
+  arrange(desc(tf_idf)) %>%
+  knitr::kable()
+```
 
 
 
