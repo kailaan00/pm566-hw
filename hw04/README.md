@@ -62,8 +62,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: nanoseconds
     ##          expr     min      lq    mean  median      uq     max neval
-    ##     fun1(dat) 2617251 2671709 2714382 2696355 2740396 2916750   100
-    ##  fun1alt(dat) 1514793 1524209 1564101 1534396 1564730 3051126   100
+    ##     fun1(dat) 2629792 2665250 2706464 2689396 2737918 2851334   100
+    ##  fun1alt(dat) 1515542 1523064 1555609 1534876 1568084 2615042   100
 
 ``` r
 # Test for the second
@@ -75,8 +75,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: nanoseconds
     ##          expr     min      lq    mean  median      uq     max neval
-    ##     fun2(dat) 2603917 2649750 2694107 2676105 2728396 2883709   100
-    ##  fun2alt(dat) 1634209 1754896 2003146 1875855 1962376 8492750   100
+    ##     fun2(dat) 2646959 2691522 2760829 2750522 2826605 2979084   100
+    ##  fun2alt(dat) 1639834 1781334 2005790 1895188 1943480 8092667   100
 
 The last argument, check = “equivalent”, is included to make sure that
 the functions return the same result.
@@ -112,7 +112,7 @@ system.time({
     ## [1] 3.14124
 
     ##    user  system elapsed 
-    ##   9.471   0.106   9.588
+    ##   9.464   0.083   9.553
 
 Rewrite the previous code using parLapply() to make it run faster. Make
 sure you set the seed using clusterSetRNGStream():
@@ -131,7 +131,7 @@ system.time({
     ## [1] 3.141521
 
     ##    user  system elapsed 
-    ##   0.007   0.001   2.587
+    ##   0.008   0.000   2.550
 
 ## SQL
 
@@ -159,8 +159,96 @@ dbWriteTable(con, "category", category)
 
 # Question 1. How many many movies is there avaliable in each rating catagory.
 
+``` sql
+select rating, count(*) as '# Movies'
+from film
+group by rating
+```
+
+| rating | \# Movies |
+|:-------|----------:|
+| G      |       180 |
+| NC-17  |       210 |
+| PG     |       194 |
+| PG-13  |       223 |
+| R      |       195 |
+
+5 records
+
 # Question 2. What is the average replacement cost and rental rate for each rating category.
 
-# Question 3. Use table film_category together with film to find the how many films there are witth each category ID
+``` sql
+select rating,
+  avg(replacement_cost) as 'average replacement cost',
+  avg(rental_rate) as 'average rental rate'
+  from film
+  group by rating
+```
+
+| rating | average replacement cost | average rental rate |
+|:-------|-------------------------:|--------------------:|
+| G      |                 20.12333 |            2.912222 |
+| NC-17  |                 20.13762 |            2.970952 |
+| PG     |                 18.95907 |            3.051856 |
+| PG-13  |                 20.40256 |            3.034843 |
+| R      |                 20.23103 |            2.938718 |
+
+5 records
+
+# Question 3. Use table film_category together with film to find the how many films there are with each category ID
+
+``` sql
+select f.category_id, count(f.category_id) as 'number of films'
+  from film_category 
+  as f
+  inner join film 
+  as g on f.film_id = g.film_id
+  group by f.category_id
+```
+
+| category_id | number of films |
+|:------------|----------------:|
+| 1           |              64 |
+| 2           |              66 |
+| 3           |              60 |
+| 4           |              57 |
+| 5           |              58 |
+| 6           |              68 |
+| 7           |              62 |
+| 8           |              69 |
+| 9           |              73 |
+| 10          |              61 |
+
+Displaying records 1 - 10
 
 # Question 4. Incorporate table category into the answer to the previous question to find the name of the most popular category.
+
+``` sql
+select f.category_id, h.name, count(f.category_id) 
+    as 'number of films'
+    from film_category 
+    as f
+    inner join film 
+    as g on f.film_id = g.film_id
+    inner join category 
+    as h on f.category_id = h.category_id
+    group by f.category_id
+    order by 'number of films' desc
+```
+
+| category_id | name    | number of films |
+|------------:|:--------|----------------:|
+|          16 | Travel  |              57 |
+|          15 | Sports  |              74 |
+|          14 | Sci-Fi  |              61 |
+|          13 | New     |              63 |
+|          12 | Music   |              51 |
+|          11 | Horror  |              56 |
+|          10 | Games   |              61 |
+|           9 | Foreign |              73 |
+|           8 | Family  |              69 |
+|           7 | Drama   |              62 |
+
+Displaying records 1 - 10
+
+The name of the most popular category is ‘Sports’.

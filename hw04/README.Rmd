@@ -142,9 +142,49 @@ dbWriteTable(con, "category", category)
 
 # Question 1. How many many movies is there avaliable in each rating catagory.
 
+```{sql, connection=con}
+select rating, count(*) as '# Movies'
+from film
+group by rating
+```
+
+
 # Question 2. What is the average replacement cost and rental rate for each rating category.
 
-# Question 3. Use table film_category together with film to find the how many films there are witth each category ID
+```{sql, connection=con}
+select rating,
+  avg(replacement_cost) as 'average replacement cost',
+  avg(rental_rate) as 'average rental rate'
+  from film
+  group by rating
+```
+
+
+# Question 3. Use table film_category together with film to find the how many films there are with each category ID
+
+```{sql, connection=con}
+select f.category_id, count(f.category_id) as 'number of films'
+  from film_category 
+  as f
+  inner join film 
+  as g on f.film_id = g.film_id
+  group by f.category_id
+```
+
 
 # Question 4. Incorporate table category into the answer to the previous question to find the name of the most popular category.
+
+```{sql, connection=con}
+select f.category_id, h.name, count(f.category_id) 
+    as 'number of films'
+    from film_category 
+    as f
+    inner join film 
+    as g on f.film_id = g.film_id
+    inner join category 
+    as h on f.category_id = h.category_id
+    group by f.category_id
+    order by 'number of films' desc
+```
+The name of the most popular category is 'Sports'.
 
