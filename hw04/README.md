@@ -1,10 +1,12 @@
 hw04
 ================
 Kaila An
-2022-11-15
+2022-11-16
 
 ``` r
 library(parallel)
+library(RSQLite)
+library(DBI)
 ```
 
 ## HPC
@@ -62,8 +64,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: nanoseconds
     ##          expr     min      lq    mean  median      uq     max neval
-    ##     fun1(dat) 2629792 2665250 2706464 2689396 2737918 2851334   100
-    ##  fun1alt(dat) 1515542 1523064 1555609 1534876 1568084 2615042   100
+    ##     fun1(dat) 2627250 2659480 2709543 2693126 2736438 3029251   100
+    ##  fun1alt(dat) 1516042 1521251 1566706 1536980 1582126 2765459   100
 
 ``` r
 # Test for the second
@@ -75,8 +77,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: nanoseconds
     ##          expr     min      lq    mean  median      uq     max neval
-    ##     fun2(dat) 2646959 2691522 2760829 2750522 2826605 2979084   100
-    ##  fun2alt(dat) 1639834 1781334 2005790 1895188 1943480 8092667   100
+    ##     fun2(dat) 2690792 2739480 2798014 2777376 2843397 3084376   100
+    ##  fun2alt(dat) 1651168 1763272 1994516 1859646 1941022 8608834   100
 
 The last argument, check = “equivalent”, is included to make sure that
 the functions return the same result.
@@ -112,7 +114,7 @@ system.time({
     ## [1] 3.14124
 
     ##    user  system elapsed 
-    ##   9.464   0.083   9.553
+    ##   9.456   0.117   9.581
 
 Rewrite the previous code using parLapply() to make it run faster. Make
 sure you set the seed using clusterSetRNGStream():
@@ -131,7 +133,7 @@ system.time({
     ## [1] 3.141521
 
     ##    user  system elapsed 
-    ##   0.008   0.000   2.550
+    ##   0.007   0.000   2.671
 
 ## SQL
 
@@ -139,9 +141,6 @@ system.time({
 # setup a temporary database
 
 # install.packages(c("RSQLite", "DBI"))
-
-library(RSQLite)
-library(DBI)
 
 # Initialize a temporary in memory database
 con <- dbConnect(SQLite(), ":memory:")

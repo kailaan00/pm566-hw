@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(parallel)
+library(RSQLite)
+library(DBI)
 ```
 
 
@@ -121,9 +123,6 @@ system.time({
 # setup a temporary database
 
 # install.packages(c("RSQLite", "DBI"))
-
-library(RSQLite)
-library(DBI)
 
 # Initialize a temporary in memory database
 con <- dbConnect(SQLite(), ":memory:")
