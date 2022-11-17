@@ -185,5 +185,5 @@ select f.category_id, h.name, count(f.category_id)
     group by f.category_id
     order by 'number of films' desc
 ```
-The name of the most popular category is 'Sports'.
+The most popular category is 'Sports' (74).
 

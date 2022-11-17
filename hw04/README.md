@@ -64,8 +64,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: nanoseconds
     ##          expr     min      lq    mean  median      uq     max neval
-    ##     fun1(dat) 2627250 2659480 2709543 2693126 2736438 3029251   100
-    ##  fun1alt(dat) 1516042 1521251 1566706 1536980 1582126 2765459   100
+    ##     fun1(dat) 2636584 2660480 2707299 2697855 2732688 2953376   100
+    ##  fun1alt(dat) 1515334 1520584 1565578 1530417 1577876 3006709   100
 
 ``` r
 # Test for the second
@@ -77,8 +77,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: nanoseconds
     ##          expr     min      lq    mean  median      uq     max neval
-    ##     fun2(dat) 2690792 2739480 2798014 2777376 2843397 3084376   100
-    ##  fun2alt(dat) 1651168 1763272 1994516 1859646 1941022 8608834   100
+    ##     fun2(dat) 2914376 2969542 3027998 3003876 3068938 3351251   100
+    ##  fun2alt(dat) 1636167 1783042 2014856 1879896 1969167 8762084   100
 
 The last argument, check = “equivalent”, is included to make sure that
 the functions return the same result.
@@ -114,7 +114,7 @@ system.time({
     ## [1] 3.14124
 
     ##    user  system elapsed 
-    ##   9.456   0.117   9.581
+    ##   9.463   0.065   9.540
 
 Rewrite the previous code using parLapply() to make it run faster. Make
 sure you set the seed using clusterSetRNGStream():
@@ -133,7 +133,7 @@ system.time({
     ## [1] 3.141521
 
     ##    user  system elapsed 
-    ##   0.007   0.000   2.671
+    ##   0.007   0.000   2.569
 
 ## SQL
 
@@ -250,4 +250,4 @@ select f.category_id, h.name, count(f.category_id)
 
 Displaying records 1 - 10
 
-The name of the most popular category is ‘Sports’.
+The most popular category is ‘Sports’ (74).
